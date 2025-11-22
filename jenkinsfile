@@ -1,0 +1,48 @@
+pipeline {
+  agent any
+
+  parameters {
+    booleanParam(name: 'executeTests', defaultValue: true, description: 'Run tests?')
+  }
+
+  environment {
+    VERSION = '1.0.0'
+  }
+
+  tools {
+    maven 'Maven'   // Name must match the Maven installation in Jenkins
+  }
+
+  stages {
+    stage('Build') {
+      steps {
+        echo "Building.."
+        // on Windows use bat; on Linux use sh
+        bat 'mvn -B -DskipTests=true clean package'
+      }
+    }
+
+    stage('Test') {
+      when {
+        expression { return params.executeTests == true }
+      }
+      steps {
+        echo "Testing.."
+        bat 'mvn -B test'
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        echo "Deploying.."
+        // placeholder deploy command
+      }
+    }
+  }
+
+  post {
+    always {
+      echo 'Pipeline Completed'
+    }
+  }
+}
