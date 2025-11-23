@@ -1,49 +1,48 @@
 pipeline {
-  agent any
+    agent any
 
-  parameters {
-    booleanParam(name: 'executeTests', defaultValue: true, description: 'Run tests?')
-  }
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/Ahtisham0312/jenkins-lab.git'
+            }
+        }
 
-  environment {
-    VERSION = '1.0.0'
-  }
+        stage('Build') {
+            steps {
+                echo "Running build..."
+                // Example commands:
+                // sh 'npm install'
+                // sh './mvnw clean package'
+            }
+        }
 
-  tools {
-    maven 'Maven'   // Name must match the Maven installation in Jenkins
-  }
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                // Example:
+                // sh 'npm test'
+                // sh './mvnw test'
+            }
+        }
 
-  stages {
-    stage('Build') {
-      steps {
-        echo "Building.."
-        // on Windows use bat; on Linux use sh
-        bat 'mvn -B -DskipTests=true clean package'
-      }
+        stage('Deploy') {
+            steps {
+                echo "Deploying application..."
+                // Example:
+                // sh 'docker build -t myapp .'
+                // sh 'scp target/app.jar user@server:/apps/'
+            }
+        }
     }
 
-    stage('Test') {
-      when {
-        expression { return params.executeTests == true }
-      }
-      steps {
-        echo "Testing.."
-        bat 'mvn -B test'
-      }
+    post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed!"
+        }
     }
-
-    stage('Deploy') {
-      steps {
-        echo "Deploying.."
-        // placeholder deploy command
-      }
-    }
-  }
-
-  post {
-    always {
-      echo 'Pipeline Completed'
-    }
-  }
 }
-
